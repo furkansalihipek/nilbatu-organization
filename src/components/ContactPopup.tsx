@@ -20,7 +20,7 @@ export default function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
 
   const handleWhatsApp = () => {
     // WhatsApp numarasını buraya ekleyin
-    const phoneNumber = '+905555555555' // Örnek numara
+    const phoneNumber = '+905428027617' // Örnek numara
     const message = 'Merhaba! Hizmetleriniz hakkında bilgi almak istiyorum.'
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
@@ -29,7 +29,7 @@ export default function ContactPopup({ isOpen, onClose }: ContactPopupProps) {
 
   const handleCall = () => {
     // Telefon numarasını buraya ekleyin
-    const phoneNumber = '+905555555555' // Örnek numara
+    const phoneNumber = '+905428027617' // Örnek numara
     window.location.href = `tel:${phoneNumber}`
     handleClose()
   }
