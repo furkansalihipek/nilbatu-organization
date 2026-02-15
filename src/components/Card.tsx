@@ -7,12 +7,12 @@ interface CardProps {
   onClick?: () => void;
 }
 
-const Card: React.FC<CardProps> = ({
+export default function Card({
   children,
   variant = 'default',
   className = '',
   onClick
-}) => {
+}: CardProps) {
   const baseClasses = 'rounded-lg p-6 transition-all duration-200';
   
   const variantClasses = {
@@ -30,6 +30,4 @@ const Card: React.FC<CardProps> = ({
       {children}
     </div>
   );
-};
-
-export default Card; 
+} 

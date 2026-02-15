@@ -1,113 +1,124 @@
 'use client'
 import { useState } from 'react'
-import { Button, Card, Gallery, ContactPopup } from '@/components'
+import { Card, Gallery, ContactPopup } from '@/components'
 
 export default function Cihazlarimiz() {
   const [isPopupOpen, setIsPopupOpen] = useState(false)
-
-  const equipment = [
-    {
-      category: 'Ses Sistemleri',
-      items: [
-        { name: 'Profesyonel Hoparlörler', description: 'Yüksek kaliteli ses çıkışı için profesyonel hoparlör sistemleri', icon: '🔊' },
-        { name: 'Mikrofonlar', description: 'Kablolu ve kablosuz mikrofon sistemleri', icon: '🎤' },
-        { name: 'Mikserler', description: 'Profesyonel ses mikserleri ve kontrol sistemleri', icon: '🎛️' },
-        { name: 'Amplifikatörler', description: 'Güçlü ve net ses için amplifikatör sistemleri', icon: '⚡' }
-      ]
-    },
-    {
-      category: 'Işık Sistemleri',
-      items: [
-        { name: 'LED Paneller', description: 'Modern LED ışıklandırma sistemleri', icon: '💡' },
-        { name: 'Spot Işıklar', description: 'Hareketli ve sabit spot ışık sistemleri', icon: '🔦' },
-        { name: 'Lazer Sistemleri', description: 'Etkileyici lazer ışık efektleri', icon: '✨' },
-        { name: 'Fog Makineleri', description: 'Atmosfer yaratmak için sis makineleri', icon: '☁️' }
-      ]
-    },
-    {
-      category: 'Sahne Ekipmanları',
-      items: [
-        { name: 'Sahne Platformları', description: 'Modüler sahne platformları ve rampalar', icon: '🎪' },
-        { name: 'Perdeler ve Kumaşlar', description: 'Profesyonel sahne perdeleri ve dekoratif kumaşlar', icon: '🎭' },
-        { name: 'Sahne Mobilyaları', description: 'Çeşitli sahne mobilyaları ve aksesuarlar', icon: '🪑' },
-        { name: 'Sahne Dekorasyonu', description: 'Özel tasarım sahne dekorasyon malzemeleri', icon: '🎨' }
-      ]
-    },
-    {
-      category: 'Video ve Projeksiyon',
-      items: [
-        { name: 'Projeksiyon Cihazları', description: 'Yüksek çözünürlüklü projeksiyon sistemleri', icon: '📽️' },
-        { name: 'LED Ekranlar', description: 'Büyük format LED ekranlar ve video duvarları', icon: '📺' },
-        { name: 'Kamera Sistemleri', description: 'Profesyonel video çekim ekipmanları', icon: '📹' },
-        { name: 'Video Mikserler', description: 'Çoklu video kaynak yönetimi sistemleri', icon: '🎬' }
-      ]
-    }
-  ]
 
   // Galeri için örnek görseller
   const galleryItems = [
     {
       id: 1,
-      title: 'Profesyonel Ses Sistemi',
       category: 'Ses Sistemleri',
       image: "https://www.bhphotovideo.com/images/fb/turbosound_iq18b_3000w_18_powered_subwoofer_1820893.jpg",
-      description: 'Yüksek kalitesli seslendirme için en güncel ekipmanlar'
     },
     {
       id: 2,
-      title: 'Işıklandırma Sistemleri',
       category: 'Işık Sistemleri',
       image: "https://www.sesnosa.com/idea/fy/85/myassets/products/086/1.jpg?revision=1711061524",
-      description: 'Modern güçlü ışıklandırma sistemleri ile etkileyici görsel efektler'
     },
     {
       id: 3,
-      title: 'Sahne Platformu',
       category: 'Sahne Ekipmanları',
       image: "https://temteknoloji.com.tr/wp-content/uploads/2024/06/image_1950-17.jpeg",
-      description: 'Modüler sahne platformları ve profesyonel kurulum'
     },
     {
       id: 4,
-      title: 'Projeksiyon Sistemi',
-      category: 'Video Wall ve Projeksiyon',
+      category: 'Led Wall ve Projeksiyon',
       image: 'https://platincdn.com/466/pictures/QFOZWPZPVI4272022155433_optoma-w400-lwe-03.jpg',
-      description: 'Yüksek çözünürlüklü projeksiyon sistemleri'
     },
     {
       id: 5,
-      title: 'Reji Mikseri',
       category: 'Ses Sistemleri',
       image: "https://www.maydanozmuzik.com/midas-midas-m32-live-53979-58-B.jpg",
-      description: 'Profesyonel ses mikserleri ve kontrol sistemleri'
     },
     {
       id: 6,
-      title: 'Kamera/Fotoğraf',
-      category: 'Görsel Kayıt Sistemleri',
-      image: "https://d17bck4wpaw2mg.cloudfront.net/att/a/2/c/z/a2cz10/ltht.jpg",
-      description: 'Ortama özel yüksek çözünürlüklü kayıt ve yayın sistemleri'
+      category: 'Ses Sistemleri',
+      image: "https://www.sescibaba.com/x32-40-kanalli-dijital-mikser-behringer-x32-90704-43-B.webp",
     },
     {
       id: 7,
-      title: 'Jimmy Jib ',
       category: 'Görsel Kayıt Sistemleri',
-      image: "https://sc04.alicdn.com/kf/H388defe2297a421690ccc523f45f6a81m.jpg",
-      description: "Hareketli ve dinamik çekimler için profesyonel jimmy jib sistemleri"
+      image: "https://d17bck4wpaw2mg.cloudfront.net/att/a/2/c/z/a2cz10/ltht.jpg",
     },
     {
       id: 8,
-      title: 'LED Ekran',
-      category: 'Video Wall ve Projeksiyon',
+      category: 'Görsel Kayıt Sistemleri',
+      image: "https://static.wixstatic.com/media/13ef96_3d08ad16152a471e9d193b14010a356d~mv2.png/v1/fill/w_980,h_551,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/13ef96_3d08ad16152a471e9d193b14010a356d~mv2.png",
+    },
+    {
+      id: 9,
+      category: 'Led Wall ve Projeksiyon',
       image: 'https://ledcontrollercard.com/wp-content/uploads/2023/03/products-23_5.jpg',
-      description: 'İstenilen ölçülerlerde indoor ve outdoor led ekranlar'
-    }
-  ]
+    },
+    {
+      id: 10,
+      category: 'Ses Sistemleri',
+      image: 'https://media.sweetwater.com/m/products/image/8bcb63a95d7YTmTKf7LTz0QXE7zMUu7PXx99mSyC.jpg',
+    },
+    {
+      id: 11,
+      category: 'Ses Sistemleri',
+      image: 'https://cdn.qukasoft.com/f/733039/bzR6WWFuTXorNjQrTmlwc0g0TnNhYmhESUE9PQ/images/urunler/yamaha-dbr-12-12-aktif-kabin-hoparlor-1000wat-26980-1.jpg',
+    },
+    {
+      id: 12,
+      category: 'Ses Sistemleri',
+      image: 'https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_28/281296/6684120_800.jpg',
+    },
+    {
+      id: 13,
+      category: 'Ses Sistemleri',
+      image: 'https://www.soundrent.be/wp-content/uploads/2017/03/qlxd24_b58a_wireless_system_beta58a.png',
+    },
+    {
+      id: 14,
+      category: 'Ses Sistemleri',
+      image: 'linearray.jpeg',
+    },
+    {
+      id: 15,
+      category: 'Işık Sistemleri',
+      image: 'https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_32/325876/17317964_800.jpg',
+    },
+    {
+      id: 16,
+      category: 'Işık Sistemleri',
+      image: 'https://static.ticimax.cloud/cdn-cgi/image/width=-,quality=85/32476/uploads/urunresimleri/buyuk/redjet-cob-4100w-4x100-watt-led-cob-mo--df633.jpg',
+    },
+    {
+      id: 17,
+      category: 'Işık Sistemleri',
+      image: 'https://cdn.qukasoft.com/f/733039/bzR6WmFtNG0vcUp3ZUdFOVU1NG5hQT09/p/metex-ledfres300a-rgbw-fresnel-spot-300-watt-auto-zoom-80133814-sw772sh1022.webp',
+    },
+    {
+      id: 18,
+      category: 'Işık Sistemleri',
+      image: 'https://eniyises.com/highline-pilot-2000-isik-mikseri-super-teklif-super-fiyat-highline-35730-84-B.jpg',
+    },
+    {
+      id: 19,
+      category: 'Işık Sistemleri',
+      image: 'prostone.jpg',
+    },
+    {
+      id: 20,
+      category: 'Led Wall ve Projeksiyon',
+      image: 'led.png',
+    },
+    {
+      id: 21,
+      category: 'Görsel Kayıt Sistemleri',
+      image: 'https://eu.connect.panasonic.com/sites/default/files/media/image/2022-09/ag-ac160a-ac130a-side-01-high-res.jpg',
+    },
+    {
+      id: 22,
+      category: 'Görsel Kayıt Sistemleri',
+      image: 'https://provideo.com.tr/wp-content/uploads/2021/09/Avmatrix-HVS0402U-2-.jpg',
+    },
 
-  const handleSubmit = (formData: FormData) => {
-    console.log(formData);
-    setIsPopupOpen(false);
-  };
+  ]
 
   return (
     <div className="min-h-screen">
@@ -132,42 +143,13 @@ export default function Cihazlarimiz() {
         </div>
       </section>
 
-      {/* Equipment Categories */}
-      {/* <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {equipment.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="mb-16">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                  {category.category}
-                </h2>
-                <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {category.items.map((item, itemIndex) => (
-                  <Card key={itemIndex} variant="elevated" className="text-center hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <div className="text-4xl mb-4">{item.icon}</div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {item.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      {item.description}
-                    </p>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section> */}
-
       {/* Gallery Section */}
       <section className="py-16 bg-gray-50">
         <Gallery
           items={galleryItems}
           title="Ekipman Galerimiz"
           description="Profesyonel ekipmanlarımızın görsellerini inceleyin. Her kategori için detaylı bilgi alabilirsiniz."
+          hideAllCategory
         />
       </section>
 

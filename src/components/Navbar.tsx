@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const Navbar: React.FC = () => {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -12,6 +12,7 @@ const Navbar: React.FC = () => {
     { href: '/', label: 'Anasayfa' },
     { href: '/hizmetlerimiz', label: 'Hizmetlerimiz' },
     { href: '/cihazlarimiz', label: 'Cihazlarımız' },
+    { href: '/galeri', label: 'Galeri' },
     { href: '/iletisim', label: 'İletişim' }
   ];
 
@@ -98,6 +99,4 @@ const Navbar: React.FC = () => {
       </div>
     </nav>
   );
-};
-
-export default Navbar; 
+} 

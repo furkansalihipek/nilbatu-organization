@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'NİLBATU - Profesyonel Organizasyon Hizmetleri',
   description: 'Profesyonel organizasyon hizmetleri ile etkinliklerinizi unutulmaz kılıyoruz. Kaliteli ekipman ve uzman ekibimizle hizmetinizdeyiz.',
+  icons: {
+    icon: '/nilbatu.png',
+  },
 }
 
 export default function RootLayout({

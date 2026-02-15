@@ -43,7 +43,15 @@ export default function Iletisim() {
 
       if (response.ok) {
         setSubmitStatus('success');
-        setSubmitMessage(result.message);
+        // E-posta gönderilemediyse uyarı mesajı ekle
+        if (result.emailSent === false && result.emailError) {
+          setSubmitMessage(
+            result.message + 
+            ' (Not: E-posta servisi yapılandırılmamış olabilir. Mesajınız yine de alındı.)'
+          );
+        } else {
+          setSubmitMessage(result.message);
+        }
         // Formu temizle
         setFormData({
           name: '',
@@ -56,7 +64,7 @@ export default function Iletisim() {
         setSubmitStatus('error');
         setSubmitMessage(result.error || 'Bir hata oluştu. Lütfen tekrar deneyin.');
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
       setSubmitMessage('Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.');
     } finally {
@@ -101,7 +109,6 @@ export default function Iletisim() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Input
-                    label="Ad Soyad"
                     placeholder="Adınız ve soyadınız"
                     name="name"
                     value={formData.name}
@@ -109,27 +116,24 @@ export default function Iletisim() {
                     required
                   />
                   <Input
-                    label="Telefon"
                     placeholder="Telefon numaranız"
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    required
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Input
-                    label="E-posta (Opsiyonel)"
                     placeholder="E-posta adresiniz"
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    required
                   />
                   <Input
-                    label="Konu (Opsiyonel)"
                     placeholder="Mesaj konusu"
                     name="subject"
                     value={formData.subject}
@@ -155,17 +159,7 @@ export default function Iletisim() {
                   />
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p className="text-blue-800 text-sm">
-                      <strong>Sizinle daha hızlı iletişime geçmemiz için telefon numaranızı alıyoruz.</strong>
-                      E-posta adresinizi de verirseniz size detaylı bilgi veya fiyat teklifi gönderebiliriz.
-                    </p>
-                  </div>
-                </div>
+
 
                 {/* Status Messages */}
                 {submitStatus === 'success' && (
@@ -243,7 +237,7 @@ export default function Iletisim() {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">E-posta</h3>
-                      <p className="text-gray-600">info@nilbatu.com</p>
+                      <p className="text-gray-600">info@nilbatuorg.com</p>
                     </div>
                   </div>
                 </Card>

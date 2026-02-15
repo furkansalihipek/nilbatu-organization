@@ -1,13 +1,18 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from "@fortawesome/fontawesome-svg-core";
+import { config, library } from "@fortawesome/fontawesome-svg-core";
+import '@fortawesome/fontawesome-svg-core/styles.css';
 import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
+
+config.autoAddCss = false;
 library.add(faInstagram);
 library.add(faFacebook);
 
 
-const Footer: React.FC = () => {
+export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -73,7 +78,7 @@ const Footer: React.FC = () => {
               </p>
               <p className="flex items-center">
                 <span className="mr-2">📧</span>
-                info@nilbatu.com
+                info@nilbatuorg.com
               </p>
               <p className="flex items-center">
                 <span className="mr-2">📍</span>
@@ -85,11 +90,9 @@ const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2025 NİLBATU. Tüm hakları saklıdır.</p>
+          <p>&copy; {new Date().getFullYear()} NİLBATU. Tüm hakları saklıdır.</p>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer; 
+} 

@@ -36,16 +36,6 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => {
-                  window.location.href = '/etkinlik-takvimi';
-                }}
-              >
-                📅 Etkinlik Takvimi
-              </Button>
-
-              <Button
                 variant="outline"
                 size="lg"
                 className="border-blue-900 hover:bg-blue-900 hover:text-white"

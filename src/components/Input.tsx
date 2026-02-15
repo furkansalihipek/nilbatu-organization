@@ -7,7 +7,6 @@ interface InputProps {
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  label?: string;
   error?: string;
   disabled?: boolean;
   required?: boolean;
@@ -15,19 +14,17 @@ interface InputProps {
   name?: string;
 }
 
-const Input: React.FC<InputProps> = ({
+export default function Input({
   type = 'text',
   placeholder,
   value,
   onChange,
-  label,
   error,
   disabled = false,
   required = false,
   className = '',
   name
-}) => {
-  const [isFocused, setIsFocused] = useState(false);
+}: InputProps) {
   const [showEmailSuggestions, setShowEmailSuggestions] = useState(false);
   const [emailDomain, setEmailDomain] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -109,9 +106,7 @@ const Input: React.FC<InputProps> = ({
             }
             onChange?.(e);
           }}
-          onFocus={() => setIsFocused(true)}
           onBlur={() => {
-            setIsFocused(false);
             // E-posta önerilerini kapatmak için biraz gecikme
             setTimeout(() => setShowEmailSuggestions(false), 200);
           }}
@@ -158,6 +153,4 @@ const Input: React.FC<InputProps> = ({
       )}
     </div>
   );
-};
-
-export default Input; 
+} 

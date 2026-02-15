@@ -10,7 +10,7 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
 }
 
-const Button: React.FC<ButtonProps> = ({
+export default function Button({
   children,
   variant = 'primary',
   size = 'md',
@@ -18,7 +18,7 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   className = '',
   type = 'button'
-}) => {
+}: ButtonProps) {
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 transform hover:scale-105 active:scale-95';
   
   const variantClasses = {
@@ -47,6 +47,4 @@ const Button: React.FC<ButtonProps> = ({
       {children}
     </button>
   );
-};
-
-export default Button; 
+}
