@@ -11,7 +11,7 @@ export default function Navbar() {
   const navItems = [
     { href: '/', label: 'Anasayfa' },
     { href: '/hizmetlerimiz', label: 'Hizmetlerimiz' },
-    { href: '/cihazlarimiz', label: 'Cihazlarımız' },
+    { href: '/cihazlarimiz', label: 'Teknik Donanım' },
     { href: '/galeri', label: 'Galeri' },
     { href: '/iletisim', label: 'İletişim' }
   ];

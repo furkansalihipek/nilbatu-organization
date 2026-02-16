@@ -134,7 +134,7 @@ export default function Cihazlarimiz() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-            Cihazlarımız
+            Teknik Donanım
           </h1>
           <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed">
             En son teknoloji ekipmanlarımız ile etkinliklerinizi profesyonel seviyede gerçekleştiriyoruz.
