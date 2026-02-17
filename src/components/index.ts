@@ -7,3 +7,4 @@ export { default as BackToTop } from './BackToTop';
 export { default as Lightbox } from './Lightbox';
 export { default as Gallery } from './Gallery';
 export { default as ContactPopup } from './ContactPopup';
+export { default as VisitorCounter } from './VisitorCounter';

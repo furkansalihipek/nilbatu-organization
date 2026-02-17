@@ -58,7 +58,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/cihazlarimiz" className="text-gray-200 hover:text-blue-300 transition-colors duration-200 hover:underline">
-                  Cihazlarımız
+                  Teknik Donanım
                 </Link>
               </li>
               <li>

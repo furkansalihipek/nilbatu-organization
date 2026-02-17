@@ -1,14 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobileHidden, setIsMobileHidden] = useState(false);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const MOBILE_HIDE_DELAY = 3000; // 3 saniye sonra mobilde gizle
+
+  const isMobile = useCallback(() => {
+    return typeof window !== 'undefined' && window.innerWidth < 768;
+  }, []);
+
+  const resetMobileHideTimer = useCallback(() => {
+    if (!isMobile()) return;
+
+    // Butonu göster
+    setIsMobileHidden(false);
+
+    // Önceki zamanlayıcıyı temizle
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+    }
+
+    // Yeni zamanlayıcı başlat
+    hideTimerRef.current = setTimeout(() => {
+      setIsMobileHidden(true);
+    }, MOBILE_HIDE_DELAY);
+  }, [isMobile]);
 
   useEffect(() => {
     const toggleVisibility = () => {
       if (window.pageYOffset > 300) {
         setIsVisible(true);
+        resetMobileHideTimer();
       } else {
         setIsVisible(false);
       }
@@ -18,8 +44,11 @@ export default function BackToTop() {
 
     return () => {
       window.removeEventListener('scroll', toggleVisibility);
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
     };
-  }, []);
+  }, [resetMobileHideTimer]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -28,12 +57,18 @@ export default function BackToTop() {
     });
   };
 
+  const shouldShow = isVisible && !isMobileHidden;
+
   return (
     <>
       {isVisible && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className={`fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-500 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+            shouldShow
+              ? 'opacity-100 translate-y-0 pointer-events-auto'
+              : 'opacity-0 translate-y-4 pointer-events-none'
+          }`}
           aria-label="Yukarı çık"
         >
           <svg
