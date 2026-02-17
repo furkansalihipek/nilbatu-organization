@@ -15,9 +15,9 @@
     "@fortawesome/react-fontawesome": "^3.1.0",
     "@sendgrid/mail": "^8.1.5",
     "@types/node-telegram-bot-api": "^0.64.9",
+    "@vercel/blob": "^2.2.0",
     "leaflet": "^1.9.4",
     "next": "15.5.12",
-
     "node-telegram-bot-api": "^0.66.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",

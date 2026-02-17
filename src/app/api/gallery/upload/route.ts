@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createWriteStream, existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
-import path from 'path';
-import { Readable } from 'stream';
+import { put } from '@vercel/blob';
 
-// Görselleri ve videoları public/gallery klasörüne kaydet
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'gallery');
-
-async function ensureUploadDir() {
-  if (!existsSync(UPLOAD_DIR)) {
-    await mkdir(UPLOAD_DIR, { recursive: true });
-  }
-}
-
-// POST - Görsel/Video yükle (streaming ile büyük dosya desteği)
+// POST - Görsel/Video yükle (Vercel Blob'a)
 export async function POST(request: NextRequest) {
   try {
     // Authentication kontrolü
@@ -45,7 +33,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Dosya bilgilerini logla
     console.log(`Upload başladı: ${file.name}, Boyut: ${(file.size / 1024 / 1024).toFixed(2)}MB, Tip: ${file.type}`);
 
     // Dosya tipi kontrolü (görsel veya video)
@@ -69,61 +56,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await ensureUploadDir();
-
-    // Dosya adını oluştur (timestamp + temiz isim)
+    // Dosya adını oluştur
     const timestamp = Date.now();
-    const ext = path.extname(file.name).toLowerCase() || (isVideo ? '.mp4' : '.jpg');
-    const baseName = path.basename(file.name, path.extname(file.name)).replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-    const fileName = `${timestamp}_${baseName}${ext}`;
-    const filePath = path.join(UPLOAD_DIR, fileName);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').substring(0, 50);
+    const blobPath = `gallery/${timestamp}_${safeName}`;
 
-    // Dosyayı streaming ile diske yaz (bellek dostu)
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const nodeBuffer = Buffer.from(arrayBuffer);
-      
-      await new Promise<void>((resolve, reject) => {
-        const writeStream = createWriteStream(filePath);
-        const readable = new Readable();
-        readable.push(nodeBuffer);
-        readable.push(null);
-        
-        readable.pipe(writeStream);
-        writeStream.on('finish', () => {
-          console.log(`Dosya yazıldı: ${filePath} (${nodeBuffer.length} bytes)`);
-          resolve();
-        });
-        writeStream.on('error', (err) => {
-          console.error('Dosya yazma hatası:', err);
-          reject(err);
-        });
-      });
-    } catch (err) {
-      console.error('Dosya kaydetme hatası:', err);
-      return NextResponse.json(
-        { success: false, error: 'Dosya diske kaydedilemedi' },
-        { status: 500 }
-      );
-    }
+    // Vercel Blob'a yükle
+    const blob = await put(blobPath, file, {
+      access: 'public',
+      contentType: file.type,
+    });
 
-    // Dosyanın gerçekten yazıldığını doğrula
-    if (!existsSync(filePath)) {
-      return NextResponse.json(
-        { success: false, error: 'Dosya kaydedildi ancak doğrulanamadı' },
-        { status: 500 }
-      );
-    }
-
-    const publicUrl = `/gallery/${fileName}`;
-    
-    console.log(`Upload başarılı: ${publicUrl} (${isVideo ? 'VIDEO' : 'IMAGE'})`);
+    console.log(`Upload başarılı: ${blob.url} (${isVideo ? 'VIDEO' : 'IMAGE'})`);
 
     return NextResponse.json({
       success: true,
       data: {
-        url: publicUrl,
-        fileName: fileName,
+        url: blob.url,
+        fileName: safeName,
         size: file.size,
         type: file.type,
         isVideo: isVideo,

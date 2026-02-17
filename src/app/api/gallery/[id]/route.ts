@@ -1,52 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, readFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
-
-const GALLERY_DATA_PATH = path.join(process.cwd(), 'data', 'gallery.json');
-
-async function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!existsSync(dataDir)) {
-    await mkdir(dataDir, { recursive: true });
-  }
-}
-
-async function readGalleryData() {
-  try {
-    await ensureDataDir();
-    if (existsSync(GALLERY_DATA_PATH)) {
-      const data = await readFile(GALLERY_DATA_PATH, 'utf-8');
-      return JSON.parse(data);
-    }
-    return [];
-  } catch (error) {
-    console.error('Galeri verileri okunamadı:', error);
-    return [];
-  }
-}
-
-interface GalleryItem {
-  id: number;
-  title: string;
-  category: string;
-  image: string;
-  description: string;
-  type?: 'image' | 'video';
-  mediaUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-async function writeGalleryData(data: GalleryItem[]) {
-  try {
-    await ensureDataDir();
-    await writeFile(GALLERY_DATA_PATH, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (error) {
-    console.error('Galeri verileri yazılamadı:', error);
-    throw error;
-  }
-}
+import { del } from '@vercel/blob';
+import { readGalleryData, writeGalleryData } from '@/lib/gallery-store';
+import type { GalleryItem } from '@/lib/gallery-store';
 
 // PUT - Galeri öğesini güncelle
 export async function PUT(
@@ -76,6 +31,16 @@ export async function PUT(
         { success: false, error: 'Galeri öğesi bulunamadı' },
         { status: 404 }
       );
+    }
+
+    // Eğer görsel değiştiyse ve eski görsel Vercel Blob'da ise, eski blob'u sil
+    const oldImage = items[index].image;
+    if (image && oldImage && oldImage !== image && oldImage.includes('.public.blob.vercel-storage.com')) {
+      try {
+        await del(oldImage);
+      } catch (e) {
+        console.error('Eski blob silinemedi:', e);
+      }
     }
 
     items[index] = {
@@ -119,15 +84,25 @@ export async function DELETE(
     const { id: idParam } = await params;
     const id = parseInt(idParam);
     const items: GalleryItem[] = await readGalleryData();
-    const filteredItems = items.filter((item) => item.id !== id);
+    const itemToDelete = items.find((item) => item.id === id);
 
-    if (items.length === filteredItems.length) {
+    if (!itemToDelete) {
       return NextResponse.json(
         { success: false, error: 'Galeri öğesi bulunamadı' },
         { status: 404 }
       );
     }
 
+    // Blob'daki dosyayı da sil (eğer Vercel Blob URL'si ise)
+    if (itemToDelete.image && itemToDelete.image.includes('.public.blob.vercel-storage.com')) {
+      try {
+        await del(itemToDelete.image);
+      } catch (e) {
+        console.error('Blob dosyası silinemedi:', e);
+      }
+    }
+
+    const filteredItems = items.filter((item) => item.id !== id);
     await writeGalleryData(filteredItems);
 
     return NextResponse.json({ success: true, message: 'Galeri öğesi silindi' });

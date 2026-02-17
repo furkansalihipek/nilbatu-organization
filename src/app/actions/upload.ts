@@ -1,18 +1,7 @@
 'use server';
 
-import { createWriteStream, existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
-import path from 'path';
-import { Readable } from 'stream';
+import { put } from '@vercel/blob';
 import { cookies } from 'next/headers';
-
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'gallery');
-
-async function ensureUploadDir() {
-  if (!existsSync(UPLOAD_DIR)) {
-    await mkdir(UPLOAD_DIR, { recursive: true });
-  }
-}
 
 export async function uploadMediaAction(formData: FormData): Promise<{
   success: boolean;
@@ -54,45 +43,24 @@ export async function uploadMediaAction(formData: FormData): Promise<{
 
     console.log(`[UPLOAD] Başlıyor: ${file.name}, ${(file.size / 1024 / 1024).toFixed(2)}MB, ${file.type}`);
 
-    await ensureUploadDir();
-
     // Dosya adı oluştur
     const timestamp = Date.now();
-    const ext = path.extname(file.name).toLowerCase() || (isVideo ? '.mp4' : '.jpg');
-    const baseName = path.basename(file.name, path.extname(file.name))
-      .replace(/[^a-zA-Z0-9]/g, '_')
-      .substring(0, 50);
-    const fileName = `${timestamp}_${baseName}${ext}`;
-    const filePath = path.join(UPLOAD_DIR, fileName);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').substring(0, 50);
+    const blobPath = `gallery/${timestamp}_${safeName}`;
 
-    // Dosyayı Buffer olarak oku ve diske yaz
-    const arrayBuffer = await file.arrayBuffer();
-    const nodeBuffer = Buffer.from(arrayBuffer);
-
-    await new Promise<void>((resolve, reject) => {
-      const writeStream = createWriteStream(filePath);
-      const readable = new Readable();
-      readable.push(nodeBuffer);
-      readable.push(null);
-
-      readable.pipe(writeStream);
-      writeStream.on('finish', () => resolve());
-      writeStream.on('error', (err) => reject(err));
+    // Vercel Blob'a yükle
+    const blob = await put(blobPath, file, {
+      access: 'public',
+      contentType: file.type,
     });
 
-    // Dosyanın kaydedildiğini doğrula
-    if (!existsSync(filePath)) {
-      return { success: false, error: 'Dosya kaydedildi ancak doğrulanamadı.' };
-    }
-
-    const publicUrl = `/gallery/${fileName}`;
-    console.log(`[UPLOAD] Başarılı: ${publicUrl} (${isVideo ? 'VIDEO' : 'IMAGE'}, ${nodeBuffer.length} bytes)`);
+    console.log(`[UPLOAD] Başarılı: ${blob.url} (${isVideo ? 'VIDEO' : 'IMAGE'}, ${file.size} bytes)`);
 
     return {
       success: true,
       data: {
-        url: publicUrl,
-        fileName,
+        url: blob.url,
+        fileName: safeName,
         isVideo,
         size: file.size,
         type: file.type,
