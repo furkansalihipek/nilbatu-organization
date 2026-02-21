@@ -21,7 +21,7 @@ export async function PUT(
     const { id: idParam } = await params;
     const id = parseInt(idParam);
     const body = await request.json();
-    const { title, category, image, description, type, mediaUrl } = body;
+    const { title, image, description, type, mediaUrl } = body;
 
     const items: GalleryItem[] = await readGalleryData();
     const index = items.findIndex((item) => item.id === id);
@@ -46,7 +46,6 @@ export async function PUT(
     items[index] = {
       ...items[index],
       title: title || items[index].title,
-      category: category || items[index].category,
       image: image || items[index].image,
       description: description !== undefined ? description : items[index].description,
       type: type !== undefined ? type : items[index].type || 'image',

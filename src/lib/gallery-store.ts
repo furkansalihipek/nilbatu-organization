@@ -5,7 +5,6 @@ const GALLERY_DATA_BLOB_NAME = 'gallery-data.json';
 export interface GalleryItem {
   id: number;
   title: string;
-  category: string;
   image: string;
   description: string;
   type?: 'image' | 'video';

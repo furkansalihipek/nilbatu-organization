@@ -29,13 +29,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, category, image, description, type, mediaUrl } = body;
+    const { title, image, description, type, mediaUrl } = body;
 
     const items = await readGalleryData();
     const newItem: GalleryItem = {
       id: items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1,
       title: title || '',
-      category: category || 'Genel',
       image: image || '',
       description: description || '',
       type: type || 'image',

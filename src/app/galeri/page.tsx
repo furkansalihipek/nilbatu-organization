@@ -6,7 +6,6 @@ import { Gallery } from '@/components';
 interface GalleryItem {
   id: number;
   title: string;
-  category: string;
   image: string;
   description: string;
   type?: 'image' | 'video';

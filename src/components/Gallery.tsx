@@ -8,7 +8,6 @@ import type { LightboxItem } from './Lightbox';
 interface GalleryItem {
   id: number;
   title?: string;
-  category: string;
   image: string;
   description?: string;
   type?: 'image' | 'video';
@@ -19,30 +18,14 @@ interface GalleryProps {
   items: GalleryItem[];
   title?: string;
   description?: string;
-  hideAllCategory?: boolean;
 }
 
-export default function Gallery({ items, title, description, hideAllCategory = false }: GalleryProps) {
-  const allCategories = items.map(item => item.category).filter(Boolean);
-  const uniqueCategories = Array.from(new Set(allCategories));
-  const categories = allCategories.length > 0
-    ? (hideAllCategory ? uniqueCategories : ['Tümü', ...uniqueCategories])
-    : [];
-
-  const defaultCategory = hideAllCategory && uniqueCategories.length > 0
-    ? uniqueCategories[0]
-    : 'Tümü';
-
-  const [selectedCategory, setSelectedCategory] = useState<string>(defaultCategory);
+export default function Gallery({ items, title, description }: GalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const filteredItems = selectedCategory === 'Tümü'
-    ? items
-    : items.filter(item => item.category === selectedCategory);
-
   // Lightbox items — video için mediaUrl veya image kullan
-  const lightboxItems: LightboxItem[] = filteredItems.map(item => {
+  const lightboxItems: LightboxItem[] = items.map(item => {
     const isVideo = (item.type || 'image') === 'video';
     return {
       src: isVideo ? (item.mediaUrl || item.image) : item.image,
@@ -68,26 +51,8 @@ export default function Gallery({ items, title, description, hideAllCategory = f
           </div>
         )}
 
-        {categories.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
-                  selectedCategory === category
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredItems.map((item, idx) => {
+          {items.map((item, idx) => {
             const isVideo = (item.type || 'image') === 'video';
 
             return (
@@ -134,7 +99,6 @@ export default function Gallery({ items, title, description, hideAllCategory = f
                   )}
                 </div>
                 <div className="p-4">
-                  {item.category && <div className="text-sm text-blue-600 font-medium mb-1">{item.category}</div>}
                   {item.title && <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>}
                   {item.description && <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>}
                 </div>
@@ -143,11 +107,11 @@ export default function Gallery({ items, title, description, hideAllCategory = f
           })}
         </div>
 
-        {filteredItems.length === 0 && (
+        {items.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">📷</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Bu kategoride görsel bulunamadı</h3>
-            <p className="text-gray-600">Farklı bir kategori seçmeyi deneyin.</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Henüz görsel eklenmemiş</h3>
+            <p className="text-gray-600">Yakında yeni görseller eklenecek.</p>
           </div>
         )}
       </div>

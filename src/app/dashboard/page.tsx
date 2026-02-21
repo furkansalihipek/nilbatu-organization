@@ -8,7 +8,6 @@ import { uploadMediaAction } from '@/app/actions/upload';
 interface GalleryItem {
   id: number;
   title: string;
-  category: string;
   image: string;
   description: string;
   type?: 'image' | 'video';
@@ -29,7 +28,6 @@ export default function Dashboard() {
 
   const [formData, setFormData] = useState({
     title: '',
-    category: '',
     image: '',
     description: '',
     type: 'image' as 'image' | 'video',
@@ -124,7 +122,7 @@ export default function Dashboard() {
       const result = await uploadMediaAction(fd);
 
       if (result.success && result.data) {
-        const url = result.data.url; // /gallery/filename.ext
+        const url = result.data.url;
         setFormData(prev => ({
           ...prev,
           image: url,
@@ -214,7 +212,7 @@ export default function Dashboard() {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', category: '', image: '', description: '', type: 'image', mediaUrl: '' });
+    setFormData({ title: '', image: '', description: '', type: 'image', mediaUrl: '' });
     setEditingItem(null);
     setShowAddForm(false);
     setUploadStatus(null);
@@ -223,7 +221,7 @@ export default function Dashboard() {
   const handleEdit = (item: GalleryItem) => {
     setEditingItem(item);
     setFormData({
-      title: item.title, category: item.category, image: item.image,
+      title: item.title, image: item.image,
       description: item.description, type: item.type || 'image', mediaUrl: item.mediaUrl || '',
     });
     setShowAddForm(true);
@@ -471,7 +469,6 @@ export default function Dashboard() {
                     )}
                   </div>
                   <div className="p-4">
-                    {item.category && <div className="text-sm text-blue-600 font-medium mb-1">{item.category}</div>}
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
                     {item.description && <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>}
                     <div className="flex gap-2">

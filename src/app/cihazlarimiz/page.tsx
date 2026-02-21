@@ -7,117 +7,28 @@ export default function Cihazlarimiz() {
 
   // Galeri için örnek görseller
   const galleryItems = [
-    {
-      id: 1,
-      category: 'Ses Sistemleri',
-      image: "https://www.bhphotovideo.com/images/fb/turbosound_iq18b_3000w_18_powered_subwoofer_1820893.jpg",
-    },
-    {
-      id: 2,
-      category: 'Işık Sistemleri',
-      image: "https://www.sesnosa.com/idea/fy/85/myassets/products/086/1.jpg?revision=1711061524",
-    },
-    {
-      id: 3,
-      category: 'Sahne Ekipmanları',
-      image: "https://temteknoloji.com.tr/wp-content/uploads/2024/06/image_1950-17.jpeg",
-    },
-    {
-      id: 4,
-      category: 'Led Wall ve Projeksiyon',
-      image: 'https://platincdn.com/466/pictures/QFOZWPZPVI4272022155433_optoma-w400-lwe-03.jpg',
-    },
-    {
-      id: 5,
-      category: 'Ses Sistemleri',
-      image: "https://www.maydanozmuzik.com/midas-midas-m32-live-53979-58-B.jpg",
-    },
-    {
-      id: 6,
-      category: 'Ses Sistemleri',
-      image: "https://www.sescibaba.com/x32-40-kanalli-dijital-mikser-behringer-x32-90704-43-B.webp",
-    },
-    {
-      id: 7,
-      category: 'Görsel Kayıt Sistemleri',
-      image: "https://d17bck4wpaw2mg.cloudfront.net/att/a/2/c/z/a2cz10/ltht.jpg",
-    },
-    {
-      id: 8,
-      category: 'Görsel Kayıt Sistemleri',
-      image: "https://static.wixstatic.com/media/13ef96_3d08ad16152a471e9d193b14010a356d~mv2.png/v1/fill/w_980,h_551,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/13ef96_3d08ad16152a471e9d193b14010a356d~mv2.png",
-    },
-    {
-      id: 9,
-      category: 'Led Wall ve Projeksiyon',
-      image: 'https://ledcontrollercard.com/wp-content/uploads/2023/03/products-23_5.jpg',
-    },
-    {
-      id: 10,
-      category: 'Ses Sistemleri',
-      image: 'https://media.sweetwater.com/m/products/image/8bcb63a95d7YTmTKf7LTz0QXE7zMUu7PXx99mSyC.jpg',
-    },
-    {
-      id: 11,
-      category: 'Ses Sistemleri',
-      image: 'https://cdn.qukasoft.com/f/733039/bzR6WWFuTXorNjQrTmlwc0g0TnNhYmhESUE9PQ/images/urunler/yamaha-dbr-12-12-aktif-kabin-hoparlor-1000wat-26980-1.jpg',
-    },
-    {
-      id: 12,
-      category: 'Ses Sistemleri',
-      image: 'https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_28/281296/6684120_800.jpg',
-    },
-    {
-      id: 13,
-      category: 'Ses Sistemleri',
-      image: 'https://www.soundrent.be/wp-content/uploads/2017/03/qlxd24_b58a_wireless_system_beta58a.png',
-    },
-    {
-      id: 14,
-      category: 'Ses Sistemleri',
-      image: 'linearray.jpeg',
-    },
-    {
-      id: 15,
-      category: 'Işık Sistemleri',
-      image: 'https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_32/325876/17317964_800.jpg',
-    },
-    {
-      id: 16,
-      category: 'Işık Sistemleri',
-      image: 'https://static.ticimax.cloud/cdn-cgi/image/width=-,quality=85/32476/uploads/urunresimleri/buyuk/redjet-cob-4100w-4x100-watt-led-cob-mo--df633.jpg',
-    },
-    {
-      id: 17,
-      category: 'Işık Sistemleri',
-      image: 'https://cdn.qukasoft.com/f/733039/bzR6WmFtNG0vcUp3ZUdFOVU1NG5hQT09/p/metex-ledfres300a-rgbw-fresnel-spot-300-watt-auto-zoom-80133814-sw772sh1022.webp',
-    },
-    {
-      id: 18,
-      category: 'Işık Sistemleri',
-      image: 'https://eniyises.com/highline-pilot-2000-isik-mikseri-super-teklif-super-fiyat-highline-35730-84-B.jpg',
-    },
-    {
-      id: 19,
-      category: 'Işık Sistemleri',
-      image: 'prostone.jpg',
-    },
-    {
-      id: 20,
-      category: 'Led Wall ve Projeksiyon',
-      image: 'led.png',
-    },
-    {
-      id: 21,
-      category: 'Görsel Kayıt Sistemleri',
-      image: 'https://eu.connect.panasonic.com/sites/default/files/media/image/2022-09/ag-ac160a-ac130a-side-01-high-res.jpg',
-    },
-    {
-      id: 22,
-      category: 'Görsel Kayıt Sistemleri',
-      image: 'https://provideo.com.tr/wp-content/uploads/2021/09/Avmatrix-HVS0402U-2-.jpg',
-    },
-
+    { id: 1, image: "https://www.bhphotovideo.com/images/fb/turbosound_iq18b_3000w_18_powered_subwoofer_1820893.jpg" },
+    { id: 2, image: "https://www.sesnosa.com/idea/fy/85/myassets/products/086/1.jpg?revision=1711061524" },
+    { id: 3, image: "https://temteknoloji.com.tr/wp-content/uploads/2024/06/image_1950-17.jpeg" },
+    { id: 4, image: 'https://platincdn.com/466/pictures/QFOZWPZPVI4272022155433_optoma-w400-lwe-03.jpg' },
+    { id: 5, image: "https://www.maydanozmuzik.com/midas-midas-m32-live-53979-58-B.jpg" },
+    { id: 6, image: "https://www.sescibaba.com/x32-40-kanalli-dijital-mikser-behringer-x32-90704-43-B.webp" },
+    { id: 7, image: "https://d17bck4wpaw2mg.cloudfront.net/att/a/2/c/z/a2cz10/ltht.jpg" },
+    { id: 8, image: "https://static.wixstatic.com/media/13ef96_3d08ad16152a471e9d193b14010a356d~mv2.png/v1/fill/w_980,h_551,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/13ef96_3d08ad16152a471e9d193b14010a356d~mv2.png" },
+    { id: 9, image: 'https://ledcontrollercard.com/wp-content/uploads/2023/03/products-23_5.jpg' },
+    { id: 10, image: 'https://media.sweetwater.com/m/products/image/8bcb63a95d7YTmTKf7LTz0QXE7zMUu7PXx99mSyC.jpg' },
+    { id: 11, image: 'https://cdn.qukasoft.com/f/733039/bzR6WWFuTXorNjQrTmlwc0g0TnNhYmhESUE9PQ/images/urunler/yamaha-dbr-12-12-aktif-kabin-hoparlor-1000wat-26980-1.jpg' },
+    { id: 12, image: 'https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_28/281296/6684120_800.jpg' },
+    { id: 13, image: 'https://www.soundrent.be/wp-content/uploads/2017/03/qlxd24_b58a_wireless_system_beta58a.png' },
+    { id: 14, image: 'linearray.jpeg' },
+    { id: 15, image: 'https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_32/325876/17317964_800.jpg' },
+    { id: 16, image: 'https://static.ticimax.cloud/cdn-cgi/image/width=-,quality=85/32476/uploads/urunresimleri/buyuk/redjet-cob-4100w-4x100-watt-led-cob-mo--df633.jpg' },
+    { id: 17, image: 'https://cdn.qukasoft.com/f/733039/bzR6WmFtNG0vcUp3ZUdFOVU1NG5hQT09/p/metex-ledfres300a-rgbw-fresnel-spot-300-watt-auto-zoom-80133814-sw772sh1022.webp' },
+    { id: 18, image: 'https://eniyises.com/highline-pilot-2000-isik-mikseri-super-teklif-super-fiyat-highline-35730-84-B.jpg' },
+    { id: 19, image: 'prostone.jpg' },
+    { id: 20, image: 'led.png' },
+    { id: 21, image: 'https://eu.connect.panasonic.com/sites/default/files/media/image/2022-09/ag-ac160a-ac130a-side-01-high-res.jpg' },
+    { id: 22, image: 'https://provideo.com.tr/wp-content/uploads/2021/09/Avmatrix-HVS0402U-2-.jpg' },
   ]
 
   return (
@@ -149,7 +60,6 @@ export default function Cihazlarimiz() {
           items={galleryItems}
           title="Ekipman Galerimiz"
           description="Profesyonel ekipmanlarımızın görsellerini inceleyin. Her kategori için detaylı bilgi alabilirsiniz."
-          hideAllCategory
         />
       </section>
 
