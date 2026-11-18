@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { config, library } from "@fortawesome/fontawesome-svg-core";
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { faFacebook, faInstagram } from "@fortawesome/free-brands-svg-icons";
-import VisitorCounter from './VisitorCounter';
 
 config.autoAddCss = false;
 library.add(faInstagram);
@@ -91,10 +90,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 mt-8 pt-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-400">&copy; {new Date().getFullYear()} NİLBATU. Tüm hakları saklıdır.</p>
-            <VisitorCounter />
-          </div>
+          <p className="text-center text-gray-400">&copy; {new Date().getFullYear()} NİLBATU. Tüm hakları saklıdır.</p>
         </div>
       </div>
     </footer>

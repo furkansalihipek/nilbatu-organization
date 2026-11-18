@@ -10,8 +10,6 @@ interface GalleryItem {
   title?: string;
   image: string;
   description?: string;
-  type?: 'image' | 'video';
-  mediaUrl?: string;
 }
 
 interface GalleryProps {
@@ -24,15 +22,10 @@ export default function Gallery({ items, title, description }: GalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Lightbox items — video için mediaUrl veya image kullan
-  const lightboxItems: LightboxItem[] = items.map(item => {
-    const isVideo = (item.type || 'image') === 'video';
-    return {
-      src: isVideo ? (item.mediaUrl || item.image) : item.image,
-      type: isVideo ? 'video' : 'image',
-      title: item.title,
-    };
-  });
+  const lightboxItems: LightboxItem[] = items.map(item => ({
+    src: item.image,
+    title: item.title,
+  }));
 
   const openLightbox = (index: number) => {
     setCurrentIndex(index);
@@ -53,8 +46,6 @@ export default function Gallery({ items, title, description }: GalleryProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {items.map((item, idx) => {
-            const isVideo = (item.type || 'image') === 'video';
-
             return (
               <Card
                 key={item.id}
@@ -65,38 +56,19 @@ export default function Gallery({ items, title, description }: GalleryProps) {
                   className="relative cursor-pointer h-48"
                   onClick={(e) => { e.stopPropagation(); openLightbox(idx); }}
                 >
-                  {isVideo ? (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative">
-                      {/* Play butonu */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all duration-300 z-10">
-                        <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl">
-                          <svg className="w-8 h-8 text-gray-800 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
-                      </div>
-                      {/* Video Badge */}
-                      <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium z-10">
-                        ▶ Video
-                      </span>
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center pointer-events-none">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                      </svg>
                     </div>
-                  ) : (
-                    <>
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center pointer-events-none">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  </div>
                 </div>
                 <div className="p-4">
                   {item.title && <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>}

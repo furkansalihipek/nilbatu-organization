@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { adminSessionCookie } from '@/lib/admin-session';
 
 export async function POST() {
   try {
@@ -8,7 +9,7 @@ export async function POST() {
     });
 
     // Session cookie'yi sil
-    response.cookies.delete('admin_session');
+    response.cookies.delete(adminSessionCookie);
 
     return response;
   } catch (error) {

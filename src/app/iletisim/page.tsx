@@ -43,15 +43,7 @@ export default function Iletisim() {
 
       if (response.ok) {
         setSubmitStatus('success');
-        // E-posta gönderilemediyse uyarı mesajı ekle
-        if (result.emailSent === false && result.emailError) {
-          setSubmitMessage(
-            result.message + 
-            ' (Not: E-posta servisi yapılandırılmamış olabilir. Mesajınız yine de alındı.)'
-          );
-        } else {
-          setSubmitMessage(result.message);
-        }
+        setSubmitMessage(result.message);
         // Formu temizle
         setFormData({
           name: '',

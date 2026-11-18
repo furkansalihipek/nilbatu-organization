@@ -1,6 +1,6 @@
-import { put, list, del } from '@vercel/blob';
-
-const GALLERY_DATA_BLOB_NAME = 'gallery-data.json';
+import fs from 'fs/promises';
+import { getCloudinaryConfig, readCloudinaryRecords, writeCloudinaryRecords } from './cloudinary';
+import { getDataDir, getGalleryDataPath } from './storage-paths';
 
 export interface GalleryItem {
   id: number;
@@ -13,54 +13,32 @@ export interface GalleryItem {
   updatedAt: string;
 }
 
-/**
- * Vercel Blob'dan galeri verilerini oku
- */
+async function ensureDataDir(): Promise<void> {
+  await fs.mkdir(getDataDir(), { recursive: true });
+}
+
 export async function readGalleryData(): Promise<GalleryItem[]> {
+  const config = getCloudinaryConfig();
+  if (config) return readCloudinaryRecords(config);
+
   try {
-    // Blob'daki gallery-data.json dosyasını bul
-    const { blobs } = await list({ prefix: GALLERY_DATA_BLOB_NAME });
-    
-    if (blobs.length === 0) {
-      return [];
-    }
-
-    // En son yüklenen blob'u al
-    const latestBlob = blobs[blobs.length - 1];
-    const response = await fetch(latestBlob.url);
-    
-    if (!response.ok) {
-      console.error('Gallery data fetch failed:', response.status);
-      return [];
-    }
-
-    const data = await response.json();
+    const raw = await fs.readFile(getGalleryDataPath(), 'utf-8');
+    const data = JSON.parse(raw);
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error('Galeri verileri okunamadı:', error);
-    return [];
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return [];
+    }
+    throw error;
   }
 }
 
-/**
- * Vercel Blob'a galeri verilerini yaz
- */
 export async function writeGalleryData(data: GalleryItem[]): Promise<void> {
-  try {
-    // Önce eski blob'ları temizle
-    const { blobs } = await list({ prefix: GALLERY_DATA_BLOB_NAME });
-    for (const blob of blobs) {
-      await del(blob.url);
-    }
+  if (process.env.GALLERY_READ_ONLY === 'true') throw new Error('Galeri salt okunur');
 
-    // Yeni veriyi yaz
-    await put(GALLERY_DATA_BLOB_NAME, JSON.stringify(data, null, 2), {
-      access: 'public',
-      contentType: 'application/json',
-      addRandomSuffix: false,
-    });
-  } catch (error) {
-    console.error('Galeri verileri yazılamadı:', error);
-    throw error;
-  }
+  const config = getCloudinaryConfig();
+  if (config) return writeCloudinaryRecords(data, config);
+
+  await ensureDataDir();
+  await fs.writeFile(getGalleryDataPath(), JSON.stringify(data, null, 2), 'utf-8');
 }

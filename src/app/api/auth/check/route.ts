@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { hasAdminSession } from '@/lib/admin-session';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = request.cookies.get('admin_session');
-    const isAuthenticated = session && session.value === 'authenticated';
-
     return NextResponse.json({
       success: true,
-      authenticated: isAuthenticated,
+      authenticated: hasAdminSession(request),
     });
   } catch (error) {
     console.error('Auth check hatası:', error);

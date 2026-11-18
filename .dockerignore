@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+.env*
+!.env.example
+*.md
+.DS_Store
+npm-debug.log*
+.vercel
+coverage
+.vscode
+.idea
+public/gallery/*
+!public/gallery/.gitkeep

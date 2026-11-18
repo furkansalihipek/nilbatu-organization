@@ -6,8 +6,8 @@ NİLBATU Organizasyon için geliştirilmiş modern ve profesyonel web sitesi. Ne
 
 - **Modern UI/UX**: Responsive tasarım ve kullanıcı dostu arayüz
 - **Hızlı Performans**: Next.js 15 ile optimize edilmiş performans
-- **İletişim Formu**: Telegram ve SendGrid entegrasyonu ile otomatik bildirimler
-- **Etkinlik Takvimi**: Organizasyon takvimi görüntüleme
+- **İletişim Formu**: Telegram entegrasyonu ile otomatik bildirimler
+- **Galeri**: Etkinlik fotoğrafları
 - **Hizmetler ve Cihazlar**: Detaylı hizmet ve ekipman bilgileri
 - **SEO Optimized**: Arama motoru optimizasyonu
 - **Mobil Uyumlu**: Tüm cihazlarda mükemmel görünüm
@@ -38,8 +38,8 @@ cp .env.example .env.local
 4. `.env.local` dosyasını düzenleyip gerekli API anahtarlarını ekleyin:
 - `TELEGRAM_BOT_TOKEN`: Telegram bot token'ı
 - `TELEGRAM_CHAT_ID`: Telegram chat ID
-- `SENDGRID_API_KEY`: SendGrid API anahtarı
-- `COMPANY_PHONE`: Şirket telefon numarası
+- `ADMIN_USERNAME` ve `ADMIN_PASSWORD`: Galeri yönetimi giriş bilgileri
+- `NEXT_PUBLIC_SITE_URL`: Sitemap ve robots.txt için sitenin adresi
 
 5. Development server'ı başlatın:
 ```bash
@@ -57,6 +57,13 @@ npm start
 ```
 
 ## 🌐 Deployment
+
+### Fly.io fotoğraf galerisi
+
+Fly.io dağıtımında Docker imajı `data/gallery-data.json` ve
+`data/gallery/uploads/` içindeki fotoğrafları taşır. Yayındaki galeri salt
+okunurdur. Yeni fotoğrafları yerel yönetici paneli üzerinden ekledikten sonra
+kayıt dosyasını ve fotoğrafları dağıtıma dahil edin.
 
 ### Vercel (Önerilen)
 
@@ -82,7 +89,7 @@ nilbatu-organization/
 │   ├── app/              # Next.js App Router sayfaları
 │   │   ├── api/          # API routes
 │   │   ├── cihazlarimiz/ # Cihazlar sayfası
-│   │   ├── etkinlik-takvimi/ # Etkinlik takvimi
+│   │   ├── galeri/      # Galeri
 │   │   ├── hizmetlerimiz/ # Hizmetler sayfası
 │   │   ├── iletisim/     # İletişim sayfası
 │   │   └── page.tsx      # Ana sayfa
@@ -97,7 +104,6 @@ nilbatu-organization/
 - **React 19**: UI kütüphanesi
 - **TypeScript**: Tip güvenliği
 - **Tailwind CSS**: Styling
-- **SendGrid**: Email servisi
 - **Telegram Bot API**: Bildirim servisi
 - **Leaflet**: Harita görüntüleme
 
@@ -106,7 +112,7 @@ nilbatu-organization/
 - **Ana Sayfa** (`/`): Hero section, özellikler, hizmetler önizleme
 - **Hizmetlerimiz** (`/hizmetlerimiz`): Detaylı hizmet bilgileri
 - **Cihazlarımız** (`/cihazlarimiz`): Ekipman ve cihaz listesi
-- **Etkinlik Takvimi** (`/etkinlik-takvimi`): Organizasyon takvimi
+- **Galeri** (`/galeri`): Etkinlik fotoğrafları
 - **İletişim** (`/iletisim`): İletişim formu ve harita
 
 ## 🔧 Geliştirme

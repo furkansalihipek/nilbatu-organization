@@ -1,15 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { hasAdminSession } from '@/lib/admin-session';
+import { saveMediaFile } from '@/lib/media-storage';
+import { createCloudinaryUpload, getCloudinaryConfig } from '@/lib/cloudinary';
 
-// POST - Görsel/Video yükle (Vercel Blob'a)
+export async function GET(request: NextRequest) {
+  if (!hasAdminSession(request)) {
+    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+  }
+
+  if (process.env.GALLERY_READ_ONLY === 'true') {
+    return NextResponse.json({ error: 'Yayındaki fotoğraflar dağıtım ile güncellenir' }, { status: 403 });
+  }
+
+  try {
+    return NextResponse.json({ upload: createCloudinaryUpload() }, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  } catch {
+    return NextResponse.json({ error: 'Medya depolama ayarları eksik' }, { status: 503 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // Authentication kontrolü
-    const session = request.cookies.get('admin_session');
-    if (!session || session.value !== 'authenticated') {
+    if (!hasAdminSession(request)) {
       return NextResponse.json(
         { success: false, error: 'Yetkisiz erişim' },
         { status: 401 }
+      );
+    }
+
+    if (process.env.GALLERY_READ_ONLY === 'true') {
+      return NextResponse.json({ success: false, error: 'Yayındaki fotoğraflar dağıtım ile güncellenir' }, { status: 403 });
+    }
+
+    if (getCloudinaryConfig()) {
+      return NextResponse.json(
+        { success: false, error: 'Dosyayı doğrudan Cloudinary’ye yükleyin' },
+        { status: 409 }
       );
     }
 
@@ -25,7 +53,6 @@ export async function POST(request: NextRequest) {
     }
 
     const file = formData.get('file') as File | null;
-
     if (!file || !(file instanceof File)) {
       return NextResponse.json(
         { success: false, error: 'Dosya bulunamadı veya geçersiz dosya' },
@@ -33,56 +60,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`Upload başladı: ${file.name}, Boyut: ${(file.size / 1024 / 1024).toFixed(2)}MB, Tip: ${file.type}`);
-
-    // Dosya tipi kontrolü (görsel veya video)
-    const isImage = file.type.startsWith('image/');
-    const isVideo = file.type.startsWith('video/');
-    
-    if (!isImage && !isVideo) {
-      return NextResponse.json(
-        { success: false, error: `Desteklenmeyen dosya tipi: ${file.type}. Sadece görsel veya video yüklenebilir.` },
-        { status: 400 }
-      );
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ success: false, error: 'Yalnızca fotoğraf yüklenebilir' }, { status: 415 });
     }
 
-    // Dosya boyutu kontrolü (görsel: max 10MB, video: max 100MB)
-    const maxSize = isImage ? 10 * 1024 * 1024 : 100 * 1024 * 1024;
-    const maxLabel = isImage ? '10MB' : '100MB';
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { success: false, error: `Dosya boyutu (${(file.size / 1024 / 1024).toFixed(1)}MB) ${maxLabel} limitini aşıyor` },
-        { status: 400 }
-      );
-    }
-
-    // Dosya adını oluştur
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').substring(0, 50);
-    const blobPath = `gallery/${timestamp}_${safeName}`;
-
-    // Vercel Blob'a yükle
-    const blob = await put(blobPath, file, {
-      access: 'public',
-      contentType: file.type,
-    });
-
-    console.log(`Upload başarılı: ${blob.url} (${isVideo ? 'VIDEO' : 'IMAGE'})`);
+    const saved = await saveMediaFile(file);
 
     return NextResponse.json({
       success: true,
       data: {
-        url: blob.url,
-        fileName: safeName,
-        size: file.size,
-        type: file.type,
-        isVideo: isVideo,
+        url: saved.url,
+        fileName: saved.filename,
+        size: saved.size,
+        type: saved.type,
+        isVideo: saved.isVideo,
       },
     });
   } catch (error) {
     console.error('Upload genel hatası:', error);
     return NextResponse.json(
-      { success: false, error: `Dosya yüklenemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}` },
+      {
+        success: false,
+        error: `Dosya yüklenemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`,
+      },
       { status: 500 }
     );
   }

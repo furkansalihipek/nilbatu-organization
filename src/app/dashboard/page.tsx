@@ -2,16 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button, Card, Input } from '@/components';
-import { isVideoUrl } from '@/lib/instagram';
-import { uploadMediaAction } from '@/app/actions/upload';
 
 interface GalleryItem {
   id: number;
   title: string;
   image: string;
   description: string;
-  type?: 'image' | 'video';
-  mediaUrl?: string;
 }
 
 export default function Dashboard() {
@@ -21,6 +17,7 @@ export default function Dashboard() {
   const [loginError, setLoginError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [galleryReadOnly, setGalleryReadOnly] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [isLoadingGallery, setIsLoadingGallery] = useState(false);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
@@ -30,8 +27,6 @@ export default function Dashboard() {
     title: '',
     image: '',
     description: '',
-    type: 'image' as 'image' | 'video',
-    mediaUrl: '',
   });
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
@@ -93,7 +88,10 @@ export default function Dashboard() {
     try {
       const response = await fetch('/api/gallery');
       const result = await response.json();
-      if (result.success) setGalleryItems(result.data || []);
+      if (result.success) {
+        setGalleryItems(result.data || []);
+        setGalleryReadOnly(result.readOnly === true);
+      }
     } catch (error) {
       console.error('Galeri yükleme hatası:', error);
     } finally {
@@ -101,12 +99,10 @@ export default function Dashboard() {
     }
   };
 
-  // Server Action ile upload — body size limit'e takılmaz
   const uploadFile = useCallback(async (file: File) => {
     const isImage = file.type.startsWith('image/');
-    const isVideoFile = file.type.startsWith('video/');
 
-    if (!isImage && !isVideoFile) {
+    if (!isImage) {
       setUploadStatus({ type: 'error', message: `Desteklenmeyen dosya tipi: ${file.type}` });
       return;
     }
@@ -119,22 +115,53 @@ export default function Dashboard() {
       const fd = new FormData();
       fd.append('file', file);
 
-      const result = await uploadMediaAction(fd);
+      const settingsResponse = await fetch('/api/gallery/upload', { cache: 'no-store' });
+      const settings = await settingsResponse.json();
+      if (!settingsResponse.ok) throw new Error(settings.error || 'Yükleme ayarları alınamadı');
 
-      if (result.success && result.data) {
+      const cloudUpload = settings.upload;
+      if (cloudUpload) {
+        const maxMegabytes = 10;
+        if (file.size > maxMegabytes * 1024 * 1024) {
+          throw new Error(`Dosya boyutu ${maxMegabytes} MB sınırını aşıyor`);
+        }
+        for (const [key, value] of Object.entries(cloudUpload.fields)) {
+          fd.set(key, String(value));
+        }
+        const cloudResponse = await fetch(cloudUpload.url, { method: 'POST', body: fd });
+        const cloudResult = await cloudResponse.json();
+        if (!cloudResponse.ok || !cloudResult.secure_url) {
+          throw new Error(cloudResult.error?.message || 'Cloudinary yüklemesi başarısız');
+        }
+        if (cloudResult.resource_type !== 'image') throw new Error('Yalnızca fotoğraf yüklenebilir');
+        setFormData(prev => ({ ...prev, image: cloudResult.secure_url }));
+        setUploadStatus({ type: 'success', message: `✅ Dosya yüklendi (${sizeMB} MB)` });
+        return;
+      }
+
+      const response = await fetch('/api/gallery/upload', {
+        method: 'POST',
+        body: fd,
+        credentials: 'include',
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success && result.data) {
         const url = result.data.url;
         setFormData(prev => ({
           ...prev,
           image: url,
-          type: result.data!.isVideo ? 'video' : 'image',
-          mediaUrl: result.data!.isVideo ? url : '',
         }));
         setUploadStatus({
           type: 'success',
-          message: `✅ ${result.data.isVideo ? 'Video' : 'Görsel'} başarıyla yüklendi! (${sizeMB}MB)`,
+          message: `✅ Fotoğraf başarıyla yüklendi! (${sizeMB}MB)`,
         });
       } else {
-        setUploadStatus({ type: 'error', message: `❌ ${result.error || 'Dosya yüklenemedi'}` });
+        setUploadStatus({
+          type: 'error',
+          message: `❌ ${result.error || 'Dosya yüklenemedi'}`,
+        });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Bilinmeyen hata';
@@ -177,17 +204,13 @@ export default function Dashboard() {
 
   const handleUrlChange = (url: string) => {
     setUploadStatus(null);
-    if (isVideoUrl(url)) {
-      setFormData({ ...formData, image: url, type: 'video', mediaUrl: url });
-    } else {
-      setFormData({ ...formData, image: url, type: 'image', mediaUrl: '' });
-    }
+    setFormData({ ...formData, image: url });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.image) {
-      alert('Lütfen bir görsel veya video ekleyin');
+      alert('Lütfen bir fotoğraf ekleyin');
       return;
     }
     try {
@@ -212,7 +235,7 @@ export default function Dashboard() {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', image: '', description: '', type: 'image', mediaUrl: '' });
+    setFormData({ title: '', image: '', description: '' });
     setEditingItem(null);
     setShowAddForm(false);
     setUploadStatus(null);
@@ -222,7 +245,7 @@ export default function Dashboard() {
     setEditingItem(item);
     setFormData({
       title: item.title, image: item.image,
-      description: item.description, type: item.type || 'image', mediaUrl: item.mediaUrl || '',
+      description: item.description,
     });
     setShowAddForm(true);
     setUploadStatus(null);
@@ -272,6 +295,16 @@ export default function Dashboard() {
     );
   }
 
+  if (galleryReadOnly) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <h1 className="text-3xl font-bold mb-4">Fotoğraf galerisi</h1>
+        <p className="mb-6">Yayındaki fotoğraflar proje dosyalarından dağıtım ile güncellenir.</p>
+        <Button variant="outline" onClick={handleLogout}>Çıkış Yap</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -300,7 +333,7 @@ export default function Dashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Görsel/Video</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Fotoğraf</label>
 
                 <div className="flex gap-4 mb-3">
                   <Input
@@ -314,7 +347,7 @@ export default function Dashboard() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*,video/*,video/mp4,video/quicktime,video/webm"
+                      accept="image/*"
                       onChange={handleMediaUpload}
                       className="hidden"
                     />
@@ -355,7 +388,7 @@ export default function Dashboard() {
                   ) : (
                     <div className="flex flex-col items-center">
                       <div className="text-4xl mb-3">🖼️ 🎬</div>
-                      <p className="text-gray-600 font-medium">Görsel veya video sürükleyip bırakın</p>
+                      <p className="text-gray-600 font-medium">Fotoğraf sürükleyip bırakın</p>
                       <p className="text-gray-400 text-sm mt-1">veya tıklayarak dosya seçin</p>
                       <p className="text-gray-400 text-xs mt-2">Görsel: max 10MB • Video: max 200MB</p>
                     </div>
@@ -376,27 +409,10 @@ export default function Dashboard() {
                 {/* Preview */}
                 {formData.image && (
                   <div className="mt-4 relative inline-block">
-                    {formData.type === 'video' ? (
-                      <div className="relative">
-                        <video
-                          key={formData.image}
-                          controls
-                          playsInline
-                          muted
-                          preload="metadata"
-                          className="max-w-md h-48 rounded-lg shadow-md bg-black"
-                        >
-                          <source src={formData.image} type="video/mp4" />
-                          <source src={formData.image} type="video/quicktime" />
-                        </video>
-                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">▶ Video</span>
-                      </div>
-                    ) : (
                       <img src={formData.image} alt="Preview" className="w-32 h-32 object-cover rounded-lg shadow-md" />
-                    )}
                     <button
                       type="button"
-                      onClick={() => { setFormData({ ...formData, image: '', mediaUrl: '', type: 'image' }); setUploadStatus(null); }}
+                      onClick={() => { setFormData({ ...formData, image: '' }); setUploadStatus(null); }}
                       className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 shadow"
                     >
                       ✕
@@ -446,27 +462,10 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleryItems.map((item) => {
-              const isVideoItem = (item.type || 'image') === 'video';
               return (
                 <Card key={item.id} variant="elevated" className="overflow-hidden">
                   <div className="relative">
-                    {isVideoItem ? (
-                      <div className="w-full h-48 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <svg className="w-6 h-6 text-gray-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
-                          <span className="text-white/70 text-xs">Video</span>
-                        </div>
-                      </div>
-                    ) : (
                       <img src={item.image} alt={item.title} className="w-full h-48 object-cover" />
-                    )}
-                    {isVideoItem && (
-                      <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">▶ Video</span>
-                    )}
                   </div>
                   <div className="p-4">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>

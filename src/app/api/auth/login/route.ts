@@ -1,34 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Environment variables'dan admin bilgilerini al
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+import { adminSessionCookie, adminSessionMaxAge, createAdminSession } from '@/lib/admin-session';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { username, password } = body;
 
-    if (!username || !password) {
+    if (typeof username !== 'string' || !username || typeof password !== 'string' || !password) {
       return NextResponse.json(
         { success: false, error: 'Kullanıcı adı ve şifre gereklidir' },
         { status: 400 }
       );
     }
 
-    // Basit authentication kontrolü
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    const adminUsername = process.env.ADMIN_USERNAME;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminUsername || !adminPassword) {
+      return NextResponse.json(
+        { success: false, error: 'Yönetici girişi yapılandırılmamış' },
+        { status: 503 }
+      );
+    }
+
+    if (username === adminUsername && password === adminPassword) {
       const response = NextResponse.json({
         success: true,
         message: 'Giriş başarılı',
       });
 
       // Session cookie oluştur (30 gün geçerli)
-      response.cookies.set('admin_session', 'authenticated', {
+      response.cookies.set(adminSessionCookie, createAdminSession(adminUsername, adminPassword), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30, // 30 gün
+        maxAge: adminSessionMaxAge,
         path: '/',
       });
 

@@ -8,8 +8,6 @@ interface GalleryItem {
   title: string;
   image: string;
   description: string;
-  type?: 'image' | 'video';
-  mediaUrl?: string;
 }
 
 export default function GaleriPage() {

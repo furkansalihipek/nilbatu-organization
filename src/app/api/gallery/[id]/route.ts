@@ -1,27 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { del } from '@vercel/blob';
+import { hasAdminSession } from '@/lib/admin-session';
 import { readGalleryData, writeGalleryData } from '@/lib/gallery-store';
 import type { GalleryItem } from '@/lib/gallery-store';
+import { isVideoUrl } from '@/lib/instagram';
+import {
+  deleteMediaByUrl,
+  isLegacyVercelBlobUrl,
+  isLocalGalleryUrl,
+} from '@/lib/media-storage';
 
-// PUT - Galeri öğesini güncelle
+async function removeGalleryMedia(url: string | undefined) {
+  if (!url || !isLocalGalleryUrl(url)) return;
+  try {
+    await deleteMediaByUrl(url);
+  } catch (e) {
+    console.error('Yerel medya silinemedi:', e);
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Authentication kontrolü
-    const session = request.cookies.get('admin_session');
-    if (!session || session.value !== 'authenticated') {
+    if (!hasAdminSession(request)) {
       return NextResponse.json(
         { success: false, error: 'Yetkisiz erişim' },
         { status: 401 }
       );
     }
 
+    if (process.env.GALLERY_READ_ONLY === 'true') {
+      return NextResponse.json({ success: false, error: 'Yayındaki fotoğraflar dağıtım ile güncellenir' }, { status: 403 });
+    }
+
     const { id: idParam } = await params;
     const id = parseInt(idParam);
     const body = await request.json();
-    const { title, image, description, type, mediaUrl } = body;
+    const { title, image, description, type } = body;
+    if (type === 'video' || (image !== undefined && (typeof image !== 'string' || isVideoUrl(image)))) {
+      return NextResponse.json({ success: false, error: 'Yalnızca fotoğraf kullanılabilir' }, { status: 400 });
+    }
 
     const items: GalleryItem[] = await readGalleryData();
     const index = items.findIndex((item) => item.id === id);
@@ -33,13 +52,13 @@ export async function PUT(
       );
     }
 
-    // Eğer görsel değiştiyse ve eski görsel Vercel Blob'da ise, eski blob'u sil
     const oldImage = items[index].image;
-    if (image && oldImage && oldImage !== image && oldImage.includes('.public.blob.vercel-storage.com')) {
-      try {
-        await del(oldImage);
-      } catch (e) {
-        console.error('Eski blob silinemedi:', e);
+
+    if (image && oldImage && oldImage !== image) {
+      if (isLocalGalleryUrl(oldImage)) {
+        await removeGalleryMedia(oldImage);
+      } else if (isLegacyVercelBlobUrl(oldImage)) {
+        console.warn('Eski Vercel Blob görseli diskten silinemez:', oldImage);
       }
     }
 
@@ -48,8 +67,6 @@ export async function PUT(
       title: title || items[index].title,
       image: image || items[index].image,
       description: description !== undefined ? description : items[index].description,
-      type: type !== undefined ? type : items[index].type || 'image',
-      mediaUrl: mediaUrl !== undefined ? mediaUrl : items[index].mediaUrl,
       updatedAt: new Date().toISOString(),
     };
 
@@ -65,19 +82,20 @@ export async function PUT(
   }
 }
 
-// DELETE - Galeri öğesini sil
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Authentication kontrolü
-    const session = request.cookies.get('admin_session');
-    if (!session || session.value !== 'authenticated') {
+    if (!hasAdminSession(request)) {
       return NextResponse.json(
         { success: false, error: 'Yetkisiz erişim' },
         { status: 401 }
       );
+    }
+
+    if (process.env.GALLERY_READ_ONLY === 'true') {
+      return NextResponse.json({ success: false, error: 'Yayındaki fotoğraflar dağıtım ile güncellenir' }, { status: 403 });
     }
 
     const { id: idParam } = await params;
@@ -92,13 +110,9 @@ export async function DELETE(
       );
     }
 
-    // Blob'daki dosyayı da sil (eğer Vercel Blob URL'si ise)
-    if (itemToDelete.image && itemToDelete.image.includes('.public.blob.vercel-storage.com')) {
-      try {
-        await del(itemToDelete.image);
-      } catch (e) {
-        console.error('Blob dosyası silinemedi:', e);
-      }
+    await removeGalleryMedia(itemToDelete.image);
+    if (itemToDelete.mediaUrl && itemToDelete.mediaUrl !== itemToDelete.image) {
+      await removeGalleryMedia(itemToDelete.mediaUrl);
     }
 
     const filteredItems = items.filter((item) => item.id !== id);
